@@ -5,41 +5,101 @@
 
 using namespace std;
 
-void ReadData( ifstream & file, vector<vector<string>> & data_vec);
-void ReadLine( string line_str, vector<string> & line_vec );
-void PrintData( vector<vector<string>> & data_vec );
-void DeleteLine( vector<vector<string>> & data_vec, int start_idx, int end_idx=-1 );
-void OuputData( vector<vector<string>> & data_vec, string file_name );
+// 資料處理類別
+class DataProcess{
+    public:
+        void ReadData( ifstream & file, vector<vector<string>> & data_vec );                // 存取資料
+        void ReadLine( string line_str, vector<string> & line_vec );                         // 存取該 line 資料
+        void PrintData( vector<vector<string>> & data_vec );                                 // 印出資料
+        void DeleteLine( vector<vector<string>> & data_vec, int start_idx, int end_idx=-1 );// 刪除某 Line (可加上end_idx 來刪除多 line 資料)
+        void OuputData( vector<vector<string>> & data_vec, string file_name );              // 輸出檔案
+        void CleanData( vector<vector<string>> & data_vec );                                 // 清除所有資料
+
+        string SetName( string origin_name, string new_head );                                // 輸出新檔案名稱 (原始檔案名, 新檔案開頭)
+
+};
+
+// 任務類別
+class FileTask{
+    public:
+        string name;                            // 檔案名稱
+        vector<vector<string>> data_vec;      // 資料 vector
+        DataProcess dp;                         // 資料處理類別
+        // --------------------------------
+        void Copy();
+        bool ReadFile( string filename );     // 讀取資料
+};
 
 
 
 int main(){
 
+    FileTask ft;
+    ft.ReadFile("input201.txt");
+    ft.Copy();
+
+}
+
+
+
+// =================================  FileTask 類別函數 ========================================================
+
+// 複製檔案
+void FileTask::Copy(){
+    dp.DeleteLine( data_vec, 0, 2);
+    dp.PrintData(data_vec);
+
+    // 輸出
+    string output_name = dp.SetName( name, "copy" );
+    ofstream  outfile( output_name );
+    dp.OuputData( data_vec, output_name );
+}
+
+
+// 讀取檔案
+bool FileTask::ReadFile( string filename ){
     // 讀取檔案
-    ifstream infile("input201.txt");
+    ifstream infile( filename );
 
     // 確認有無讀取檔案
-    if( infile.fail() )
+    if( infile.fail() ){
         cout << "Fail to read File" << endl;
-    else
+        infile.close();                     // 關閉檔案
+        return false;
+    }
+
+    else{
         cout << "Read File Success" << endl;
+        name = filename;
+        dp.ReadData( infile, data_vec );  // 存取檔案
+        infile.close();                   // 關閉檔案
+        return true;
+    }
+}
 
 
-    vector<vector<string>> data_vec;
-
-    ReadData( infile, data_vec );
-    DeleteLine( data_vec, 0, 2);
-    PrintData(data_vec);
-
-    ofstream  outfile("test_copy.txt");
-    OuputData( data_vec, "test_copy.txt");
+// =================================  DataProcess 類別函數 ========================================================
 
 
-    infile.close();
+string DataProcess::SetName( string origin_name, string new_head ){
+
+    string new_name = "";
+
+    for (int i=5 ; origin_name[i] != '.' ; i++ ){
+        new_name += origin_name[i];
+    }
+
+    new_name = new_head + new_name + ".txt";
+    return new_name;
+}
+
+
+void DataProcess::CleanData( vector<vector<string>> & data_vec ){
+    data_vec.clear();
 }
 
 // 儲存 Data 為新檔案 (或複寫檔案)
-void OuputData( vector<vector<string>> & data_vec, string file_name ){
+void DataProcess::OuputData( vector<vector<string>> & data_vec, string file_name ){
 
     ofstream outfile(file_name);
 
@@ -55,7 +115,7 @@ void OuputData( vector<vector<string>> & data_vec, string file_name ){
 
 
 // 印出 Data
-void PrintData( vector<vector<string>> & data_vec ){
+void DataProcess::PrintData( vector<vector<string>> & data_vec ){
     // 印出 Data
     for ( int i=0 ; i < data_vec.size() ; i++ ){
         cout << "[" << i+1 << "]\t";
@@ -70,7 +130,7 @@ void PrintData( vector<vector<string>> & data_vec ){
 
 
 // 刪除 Line
-void DeleteLine( vector<vector<string>> & data_vec, int start_idx, int end_idx ){
+void DataProcess::DeleteLine( vector<vector<string>> & data_vec, int start_idx, int end_idx ){
 
     vector<vector<string>>::iterator it;   // 位置指標迭代器
 
@@ -90,7 +150,7 @@ void DeleteLine( vector<vector<string>> & data_vec, int start_idx, int end_idx )
 
 
 // 讀取 Data
-void ReadData( ifstream & file, vector<vector<string>> & data_vec){
+void DataProcess::ReadData( ifstream & file, vector<vector<string>> & data_vec){
 
     string line_str;    // line 字串
 
@@ -102,7 +162,7 @@ void ReadData( ifstream & file, vector<vector<string>> & data_vec){
 }
 
 // 讀取 Line Data
-void ReadLine( string line_str, vector<string> & line_vec ){
+void DataProcess::ReadLine( string line_str, vector<string> & line_vec ){
 
     stringstream ss(line_str);              // 讀取 line_str
     string str;
