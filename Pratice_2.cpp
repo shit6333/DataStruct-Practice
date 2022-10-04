@@ -15,19 +15,25 @@ class DataProcess{
         void OuputData( vector<vector<string>> & data_vec, string file_name );              // 輸出檔案
         void CleanData( vector<vector<string>> & data_vec );                                 // 清除所有資料
 
-        string SetName( string origin_name, string new_head );                                // 輸出新檔案名稱 (原始檔案名, 新檔案開頭)
+        string SetName( int title_length , string origin_name, string new_head );            // 輸出新檔案名稱 ( 原檔開頭字元數, 原始檔案名, 新檔案開頭 )
+        string SetOuputTitle( string name1 );                                                 // 設定 case3 的 output 檔案 title
 
 };
 
 // 任務類別
 class FileTask{
     public:
-        string name;                            // 檔案名稱
-        vector<vector<string>> data_vec;      // 資料 vector
-        DataProcess dp;                         // 資料處理類別
+        string name1;                              // 檔案名稱
+        string name2;                              // 合併檔案名稱
+        DataProcess dp;                            // 資料處理類別
+        vector<vector<string>> data_vec_1;      // 資料 vector
+        vector<vector<string>> data_vec_2;      // 用以儲存要合併的 data
+
         // --------------------------------
-        void Copy();
-        bool ReadFile( string filename );     // 讀取資料
+
+        void Copy( vector<vector<string>> & data_vec );
+        void Combine( vector<vector<string>> & data_vec1, vector<vector<string>> & data_vec2 );
+        bool ReadFile( string filename, vector<vector<string>> & data_vec, string & name );     // 讀取資料
 };
 
 
@@ -35,29 +41,55 @@ class FileTask{
 int main(){
 
     FileTask ft;
-    ft.ReadFile("input201.txt");
-    ft.Copy();
+    // ft.ReadFile("input202.txt", ft.data_vec_1 );
+    // ft.Copy( ft.data_vec_1 );
 
+    ft.ReadFile("copy201.txt", ft.data_vec_1, ft.name1 );
+    ft.ReadFile("copy202.txt", ft.data_vec_2, ft.name2 );
+
+    ft.Combine( ft.data_vec_1, ft.data_vec_2 );
 }
 
 
 
 // =================================  FileTask 類別函數 ========================================================
 
+// 合併檔案
+void FileTask::Combine( vector<vector<string>> & data_vec1, vector<vector<string>> & data_vec2 ){
+    // 合併檔案
+    data_vec1.insert( data_vec1.end(), data_vec2.begin(), data_vec2.end() );
+
+    // 進行排序
+    // TODO : 用科系排序
+    // TODO : 用學校排序
+    dp.PrintData(data_vec1);
+
+    // 設定輸出檔案名
+    string title = dp.SetOuputTitle( name1 );
+    string output_name = dp.SetName( 4, name2, title);
+
+    // 輸出檔案
+    ofstream  outfile( output_name );
+    dp.OuputData( data_vec1, output_name );
+}
+
+
 // 複製檔案
-void FileTask::Copy(){
+void FileTask::Copy( vector<vector<string>> & data_vec ){
+
+    // 刪除前三行並印出 Data
     dp.DeleteLine( data_vec, 0, 2);
     dp.PrintData(data_vec);
 
     // 輸出
-    string output_name = dp.SetName( name, "copy" );
+    string output_name = dp.SetName( 5, name1, "copy" );
     ofstream  outfile( output_name );
     dp.OuputData( data_vec, output_name );
 }
 
 
 // 讀取檔案
-bool FileTask::ReadFile( string filename ){
+bool FileTask::ReadFile( string filename, vector<vector<string>> & data_vec, string & name ){
     // 讀取檔案
     ifstream infile( filename );
 
@@ -80,12 +112,23 @@ bool FileTask::ReadFile( string filename ){
 
 // =================================  DataProcess 類別函數 ========================================================
 
+string DataProcess::SetOuputTitle( string name1 ){
+    string title = "";
 
-string DataProcess::SetName( string origin_name, string new_head ){
+    for (int i=4 ; name1[i] != '.' ; i++ ){
+        title += name1[i];
+    }
+
+    return "output" + title + "_";
+}
+
+// 設定輸出檔案名
+string DataProcess::SetName( int title_length , string origin_name, string new_head ){
 
     string new_name = "";
 
-    for (int i=5 ; origin_name[i] != '.' ; i++ ){
+    // 跳過開頭 (input:5, copy:4, ...)
+    for (int i=title_length ; origin_name[i] != '.' ; i++ ){
         new_name += origin_name[i];
     }
 
