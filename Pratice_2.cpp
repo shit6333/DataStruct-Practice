@@ -15,9 +15,12 @@ class DataProcess{
         void OuputData( vector<vector<string>> & data_vec, string file_name );              // 輸出檔案
         void CleanData( vector<vector<string>> & data_vec );                                 // 清除所有資料
 
+
         string SetName( int title_length , string origin_name, string new_head );            // 輸出新檔案名稱 ( 原檔開頭字元數, 原始檔案名, 新檔案開頭 )
         string SetOuputTitle( string name1 );                                                 // 設定 case3 的 output 檔案 title
 
+        vector<string> GetUniqueData( vector<vector<string>> data_vec, int data_colunm );   // 取得 unique data
+        vector<vector<string>> UniqueSort( vector<vector<string>> data_vec, int data_column, vector<string> unique_data );  // 依照 unique_data 排序 data
 };
 
 // 任務類別
@@ -44,10 +47,11 @@ int main(){
     // ft.ReadFile("input202.txt", ft.data_vec_1 );
     // ft.Copy( ft.data_vec_1 );
 
-    ft.ReadFile("copy201.txt", ft.data_vec_1, ft.name1 );
-    ft.ReadFile("copy202.txt", ft.data_vec_2, ft.name2 );
+    ft.ReadFile("copy204.txt", ft.data_vec_1, ft.name1 );
+    ft.ReadFile("copy205.txt", ft.data_vec_2, ft.name2 );
 
     ft.Combine( ft.data_vec_1, ft.data_vec_2 );
+
 }
 
 
@@ -59,10 +63,12 @@ void FileTask::Combine( vector<vector<string>> & data_vec1, vector<vector<string
     // 合併檔案
     data_vec1.insert( data_vec1.end(), data_vec2.begin(), data_vec2.end() );
 
-    // 進行排序
-    // TODO : 用科系排序
-    // TODO : 用學校排序
-    dp.PrintData(data_vec1);
+    // 用科系名排序
+    vector<string> unique_data = dp.GetUniqueData( data_vec1, 3);
+    vector<vector<string>> sort_data_vec = dp.UniqueSort( data_vec1, 3, unique_data );
+    // 用學校名排序
+    unique_data = dp.GetUniqueData( data_vec1, 1);
+    sort_data_vec = dp.UniqueSort( sort_data_vec, 1, unique_data );
 
     // 設定輸出檔案名
     string title = dp.SetOuputTitle( name1 );
@@ -70,7 +76,10 @@ void FileTask::Combine( vector<vector<string>> & data_vec1, vector<vector<string
 
     // 輸出檔案
     ofstream  outfile( output_name );
-    dp.OuputData( data_vec1, output_name );
+    dp.OuputData( sort_data_vec, output_name );
+
+    // 印出資料
+    dp.PrintData(sort_data_vec);
 }
 
 
@@ -112,6 +121,48 @@ bool FileTask::ReadFile( string filename, vector<vector<string>> & data_vec, str
 
 // =================================  DataProcess 類別函數 ========================================================
 
+vector<vector<string>> DataProcess::UniqueSort( vector<vector<string>> data_vec, int data_column, vector<string> unique_data ){
+
+    vector<vector<string>> sort_data_vec;
+
+    // 遍歷 unique data
+    for( int i=0; i<unique_data.size(); i++ ){
+        // 遍歷所有 data
+        for(int j=0; j<data_vec.size(); j++ ){
+            if( unique_data[i] == data_vec[j][data_column] ){
+                sort_data_vec.push_back( data_vec[j] );
+            }
+        }
+    }
+
+
+    return sort_data_vec;
+}
+
+
+// 獲得某 column 非重複資料
+vector<string> DataProcess::GetUniqueData( vector<vector<string>> data_vec, int data_colunm ){
+    vector<string> unique_data;
+
+    // 遍歷所有 data
+    for( int i=0; i< data_vec.size(); i++ ){
+        if( unique_data.empty() ){
+            unique_data.push_back( data_vec[i][data_colunm] );
+        }
+        else{
+            // 遍歷已有 unique data
+            for( int j=0; j < unique_data.size(); j++ ){
+                // 如果已有相同 data 跳出
+                if( data_vec[i][data_colunm] == unique_data[j] )    break;
+                // 如果完全沒有相同 data，存此 data
+                if( j == unique_data.size() - 1 )   unique_data.push_back( data_vec[i][data_colunm] );
+            }
+        }
+    }
+    return unique_data;
+}
+
+// 設定 Task3 檔案開頭
 string DataProcess::SetOuputTitle( string name1 ){
     string title = "";
 
