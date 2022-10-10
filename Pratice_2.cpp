@@ -1,133 +1,325 @@
 #include<iostream>
-#include<fstream>   // Åª¨úÀÉ®×
-#include<sstream>   // ¤Á³Î¦r¦ê
+#include<fstream>   // è®€å–æª”æ¡ˆ
+#include<sstream>   // åˆ‡å‰²å­—ä¸²
 #include<vector>    // Vector
+#include<string.h>
+#include <cstdlib>
 
 using namespace std;
 
-// ¸ê®Æ³B²zÃş§O
+// è³‡æ–™è™•ç†é¡åˆ¥
 class DataProcess{
     public:
-        void ReadData( ifstream & file, vector<vector<string>> & data_vec );                // ¦s¨ú¸ê®Æ
-        void ReadLine( string line_str, vector<string> & line_vec );                         // ¦s¨ú¸Ó line ¸ê®Æ
-        void PrintData( vector<vector<string>> & data_vec );                                 // ¦L¥X¸ê®Æ
-        void DeleteLine( vector<vector<string>> & data_vec, int start_idx, int end_idx=-1 );// §R°£¬Y Line (¥i¥[¤Wend_idx ¨Ó§R°£¦h line ¸ê®Æ)
-        void OuputData( vector<vector<string>> & data_vec, string file_name );              // ¿é¥XÀÉ®×
-        void CleanData( vector<vector<string>> & data_vec );                                 // ²M°£©Ò¦³¸ê®Æ
+        void ReadData( ifstream & file, vector<vector<string>> & data_vec );                // å­˜å–è³‡æ–™
+        void ReadLine( string line_str, vector<string> & line_vec );                         // å­˜å–è©² line è³‡æ–™
+        void PrintData( vector<vector<string>> & data_vec );                                 // å°å‡ºè³‡æ–™
+        void DeleteLine( vector<vector<string>> & data_vec, int start_idx, int end_idx=-1 );// åˆªé™¤æŸ Line (å¯åŠ ä¸Šend_idx ä¾†åˆªé™¤å¤š line è³‡æ–™)
+        void OuputData( vector<vector<string>> & data_vec, string file_name );              // è¼¸å‡ºæª”æ¡ˆ
+        void CleanData( vector<vector<string>> & data_vec );                                 // æ¸…é™¤æ‰€æœ‰è³‡æ–™
 
-
-        string SetName( int title_length , string origin_name, string new_head );            // ¿é¥X·sÀÉ®×¦WºÙ ( ­ìÀÉ¶}ÀY¦r¤¸¼Æ, ­ì©lÀÉ®×¦W, ·sÀÉ®×¶}ÀY )
-        string SetOuputTitle( string name1 );                                                 // ³]©w case3 ªº output ÀÉ®× title
-
-        vector<string> GetUniqueData( vector<vector<string>> data_vec, int data_colunm );   // ¨ú±o unique data
-        vector<vector<string>> UniqueSort( vector<vector<string>> data_vec, int data_column, vector<string> unique_data );  // ¨Ì·Ó unique_data ±Æ§Ç data
+        string SetName( int title_length , string origin_name, string new_head );            // è¼¸å‡ºæ–°æª”æ¡ˆåç¨± ( åŸæª”é–‹é ­å­—å…ƒæ•¸, åŸå§‹æª”æ¡ˆå, æ–°æª”æ¡ˆé–‹é ­ )
+        string SetOuputTitle( string name1 );                                                 // è¨­å®š case3 çš„ output æª”æ¡ˆ title
+		vector<vector<string>> Filter( vector<vector<string>> data_vec, int num_students,int num_graduates );
+		
+        vector<string> GetUniqueData( vector<vector<string>> data_vec, int data_colunm );   // å–å¾— unique data
+        vector<vector<string>> UniqueSort( vector<vector<string>> data_vec, int data_column, vector<string> unique_data );  // ä¾ç…§ unique_data æ’åº data
 };
 
-// ¥ô°ÈÃş§O
+// ä»»å‹™é¡åˆ¥
 class FileTask{
     public:
-        string name1;                              // ÀÉ®×¦WºÙ
-        string name2;                              // ¦X¨ÖÀÉ®×¦WºÙ
-        DataProcess dp;                            // ¸ê®Æ³B²zÃş§O
-        vector<vector<string>> data_vec_1;      // ¸ê®Æ vector
-        vector<vector<string>> data_vec_2;      // ¥Î¥HÀx¦s­n¦X¨Öªº data
+        string name1;                              // æª”æ¡ˆåç¨±
+        string name2;                              // åˆä½µæª”æ¡ˆåç¨±
+        DataProcess dp;                            // è³‡æ–™è™•ç†é¡åˆ¥
+        vector<vector<string>> data_vec_1;      // è³‡æ–™ vector
+        vector<vector<string>> data_vec_2;      // ç”¨ä»¥å„²å­˜è¦åˆä½µçš„ data
 
         // --------------------------------
 
+		void Select( vector<vector<string>> & data_vec,int num_students, int num_graduates );
         void Copy( vector<vector<string>> & data_vec );
         void Combine( vector<vector<string>> & data_vec1, vector<vector<string>> & data_vec2 );
-        bool ReadFile( string filename, vector<vector<string>> & data_vec, string & name );     // Åª¨ú¸ê®Æ
+        void ReadFile( string filename, vector<vector<string>> & data_vec, string & name );     // è®€å–è³‡æ–™
+
 };
 
-
+// é˜²å‘†å‡½æ•¸ 
+bool HaveFile( string name ); //æª¢æŸ¥è¼¸å…¥çš„æª”æ¡ˆåç¨±æ˜¯å¦å­˜åœ¨ 
+bool Isint(string input);
+bool FileIsCorrect( string name, int mode );
+string FormalName( string name, int mode ); //å°‡è¼¸å…¥çš„æª”æ¡ˆåç¨±æ­£è¦åŒ– 
 
 int main(){
 
-    FileTask ft;
-    // ft.ReadFile("input202.txt", ft.data_vec_1 );
-    // ft.Copy( ft.data_vec_1 );
-
-    ft.ReadFile("copy204.txt", ft.data_vec_1, ft.name1 );
-    ft.ReadFile("copy205.txt", ft.data_vec_2, ft.name2 );
-
-    ft.Combine( ft.data_vec_1, ft.data_vec_2 );
+	int command = 10;
+	do{
+		cout << endl << "*** File Object Manipulator ***";
+		cout << endl << "* 0. QUIT                     *";
+		cout << endl << "* 1. COPY (Read & Save a file)*";
+		cout << endl << "* 2. FILTER (Reduce a file)   *";
+		cout << endl << "* 3. MERGE (Join two files)   *";
+		cout << endl << "*******************************";
+		cout << endl << "Input a choice(0, 1, 2, 3):";
+		string input;
+		cin >> input;
+		if (not Isint(input))
+			continue;
+		command = stoi(input);
+		switch( command ){
+			case 1:{
+				string open_file; // æª”æ¡ˆåç¨± 
+				do{
+					cout << endl <<"Input 201, 202, ...[0]Quit):";
+					cin >> open_file;
+					// æ­£è¦åŒ–æª”æ¡ˆåç¨± 
+					open_file = FormalName(open_file,1);
+				}while(!HaveFile(open_file) or !FileIsCorrect( open_file, 1 )); // æª”æ¡ˆæ˜¯å¦å­˜åœ¨ 
+				
+				// è‹¥è¼¸å…¥0å‰‡çµæŸ 
+				if (open_file[0] == '0' and open_file.size() == 1)
+					break;
+					
+				FileTask ft;
+			    ft.ReadFile(open_file, ft.data_vec_1, ft.name1 );
+			    ft.Copy( ft.data_vec_1 );
+			    break;
+			}
+			
+			case 2:{
+				string open_file,students,graduates;
+				int num_students, num_graduates;
+				// è¼¸å…¥æª”æ¡ˆ 
+				do{
+					cout << endl << "Input 201, 202, ...[0]Quit):";
+					cin >> open_file;
+					open_file = FormalName(open_file,2);
+				}while( !HaveFile(open_file) or !FileIsCorrect( open_file, 2 ) );
+				
+				if (open_file[0] == '0' and open_file.size() == 1)
+					break;
+					
+				// è¼¸å…¥å­¸ç”Ÿæ•¸ 
+				do{
+					cout << endl << "Input a lower bound on the number of students:";
+					cin >> students;
+				}while(!Isint(students));
+				
+				// è¼¸å…¥ç•¢æ¥­æ•¸ 
+				do{
+					cout << endl << "Input a lower bound on the number of graduates:";
+					cin >> graduates;
+				}while(!Isint(graduates));
+				
+				num_students = stoi(students);
+				num_graduates = stoi(graduates);
+				
+				FileTask ft;
+			    ft.ReadFile(open_file, ft.data_vec_1, ft.name1 );
+			    ft.Select( ft.data_vec_1, num_students, num_graduates);
+			    break;
+			}
+			
+			case 3:{
+				string open_file1,open_file2;
+					do{
+				cout << endl << "Input 201, 202, ...[0]Quit):";
+					cin >> open_file1;
+					open_file1 = FormalName(open_file1,3);
+				}while(!HaveFile(open_file1) or !FileIsCorrect( open_file1, 3 ));
+				if (open_file1[0] == '0' and open_file1.size() == 1)
+					break;
+					
+				do{
+					cout << endl << "Input 201, 202, ...[0]Quit):";
+					cin >> open_file2;
+					open_file2 = FormalName(open_file2,3);
+				}while(!HaveFile(open_file2) or !FileIsCorrect( open_file2, 3 ));
+				if (open_file2[0] == '0' and open_file2.size() == 1)
+					break;
+					
+				FileTask ft;
+			    ft.ReadFile(open_file1, ft.data_vec_1, ft.name1 );
+			    ft.ReadFile(open_file2, ft.data_vec_2, ft.name2 );
+			    ft.Combine( ft.data_vec_1, ft.data_vec_2 );
+			    break;
+			}
+			
+			default:{
+				cout << "Command does not exist!";
+			    break;
+			}
+		}
+	}while( command != 0 );
 
 }
 
 
 
-// =================================  FileTask Ãş§O¨ç¼Æ ========================================================
+// =================================  FileTask é¡åˆ¥å‡½æ•¸ ========================================================
 
-// ¦X¨ÖÀÉ®×
+
+// åˆä½µæª”æ¡ˆ
 void FileTask::Combine( vector<vector<string>> & data_vec1, vector<vector<string>> & data_vec2 ){
-    // ¦X¨ÖÀÉ®×
+    // åˆä½µæª”æ¡ˆ
     data_vec1.insert( data_vec1.end(), data_vec2.begin(), data_vec2.end() );
 
-    // ¥Î¬ì¨t¦W±Æ§Ç
+    // ç”¨ç§‘ç³»åæ’åº
     vector<string> unique_data = dp.GetUniqueData( data_vec1, 3);
     vector<vector<string>> sort_data_vec = dp.UniqueSort( data_vec1, 3, unique_data );
-    // ¥Î¾Ç®Õ¦W±Æ§Ç
+    // ç”¨å­¸æ ¡åæ’åº
     unique_data = dp.GetUniqueData( data_vec1, 1);
     sort_data_vec = dp.UniqueSort( sort_data_vec, 1, unique_data );
 
-    // ³]©w¿é¥XÀÉ®×¦W
+    // è¨­å®šè¼¸å‡ºæª”æ¡ˆå
     string title = dp.SetOuputTitle( name1 );
     string output_name = dp.SetName( 4, name2, title);
 
-    // ¿é¥XÀÉ®×
+    // è¼¸å‡ºæª”æ¡ˆ
     ofstream  outfile( output_name );
     dp.OuputData( sort_data_vec, output_name );
 
-    // ¦L¥X¸ê®Æ
+    // å°å‡ºè³‡æ–™
     dp.PrintData(sort_data_vec);
 }
 
 
-// ½Æ»sÀÉ®×
+// è¤‡è£½æª”æ¡ˆ
 void FileTask::Copy( vector<vector<string>> & data_vec ){
-
-    // §R°£«e¤T¦æ¨Ã¦L¥X Data
+    // åˆªé™¤å‰ä¸‰è¡Œä¸¦å°å‡º Data
     dp.DeleteLine( data_vec, 0, 2);
     dp.PrintData(data_vec);
 
-    // ¿é¥X
+    // è¼¸å‡º
     string output_name = dp.SetName( 5, name1, "copy" );
     ofstream  outfile( output_name );
     dp.OuputData( data_vec, output_name );
 }
 
+// ç¯©é¸æª”æ¡ˆ
+void FileTask::Select( vector<vector<string>> & data_vec,int num_students, int num_graduates ){
+	//ç¯©é¸ data_vec
+	data_vec = dp.Filter( data_vec, num_students, num_graduates );
+    // å°å‡º Data
+    dp.PrintData(data_vec);
 
-// Åª¨úÀÉ®×
-bool FileTask::ReadFile( string filename, vector<vector<string>> & data_vec, string & name ){
-    // Åª¨úÀÉ®×
-    ifstream infile( filename );
-
-    // ½T»{¦³µLÅª¨úÀÉ®×
-    if( infile.fail() ){
-        cout << "Fail to read File" << endl;
-        infile.close();                     // Ãö³¬ÀÉ®×
-        return false;
-    }
-
-    else{
-        cout << "Read File Success" << endl;
-        name = filename;
-        dp.ReadData( infile, data_vec );  // ¦s¨úÀÉ®×
-        infile.close();                   // Ãö³¬ÀÉ®×
-        return true;
-    }
+    // è¼¸å‡º
+    string output_name = dp.SetName( 4, name1, "copy" );
+    ofstream  outfile( output_name );
+    dp.OuputData( data_vec, output_name );
 }
 
 
-// =================================  DataProcess Ãş§O¨ç¼Æ ========================================================
+
+// è®€å–æª”æ¡ˆ 
+void FileTask::ReadFile( string filename, vector<vector<string>> & data_vec, string & name ){
+    // è®€å–æª”æ¡ˆ
+    ifstream infile( filename );
+    name = filename;
+    dp.ReadData( infile, data_vec );  // å­˜å–æª”æ¡ˆ
+    infile.close();                   // é—œé–‰æª”æ¡ˆ
+}
+
+// =================================  é˜²å‘†å‡½æ•¸ ========================================================
+
+ 
+// æª¢æŸ¥æª”æ¡ˆåç¨±æ˜¯å¦å­˜åœ¨
+bool HaveFile( string name ) {
+	ifstream infile( name );
+	if (name[0] == '0' and name.size() == 1)
+		return true;
+    // ç¢ºèªæœ‰ç„¡è®€å–æª”æ¡ˆ
+    if( infile.fail() ){
+        cout << "### "<<name<<" does not exist! ###" << endl;
+        infile.close();                     // é—œé–‰æª”æ¡ˆ
+        return false;
+    }
+	return true;
+}
+
+// åˆ¤æ–·åç¨±æ˜¯å¦æ­£è¦
+bool FileIsCorrect( string name, int mode ){
+	if(mode == 1){
+		string test = "input";
+		for( int i = 0; i < 5; i++ ){
+			if( test[i]!=name[i])
+				return false;
+		}
+	}
+	else if ( mode == 2 or mode == 3) {
+		string test = "copy";
+		for( int i = 0; i < 4; i++ ){
+			if( test[i]!=name[i])
+				return false;
+		}
+	}
+			
+	return true;
+}
+// æ­£è¦åŒ–æª”æ¡ˆåç¨±
+string FormalName( string name, int mode ){
+	if (name[0] == '0' and name.size() == 1)
+		return name;
+	if (Isint(name)){
+		if(mode == 1)
+			name = "input" + name + ".txt";
+		else if ( mode == 2) 
+			name = "copy" + name + ".txt";
+		else if (mode == 3 )
+			name = "copy" + name + ".txt";
+	}
+	return name;
+} 
+
+
+// åˆ¤æ–·å­—ä¸²æ˜¯å¦å…¨ç‚ºæ­£æ•´æ•¸ 
+bool Isint(string input){
+	for( int i = 0; i < input.size() ; i++ ) {
+		if( input[i] > '9' or input[i] < '0')
+			return false;
+	}
+	return true;
+} //Isint()
+
+// =================================  DataProcess é¡åˆ¥å‡½æ•¸ ========================================================
+
+// ç¯©é¸æ¢ä»¶
+vector<vector<string>> DataProcess::Filter( vector<vector<string>> data_vec, int num_students,int num_graduates ){
+	
+	vector<vector<string>> result;
+	
+	int k = 0;
+    for ( int i=0 ; i < data_vec.size() ; i++ ){
+    	if ( stoi(data_vec[i][6]) > num_students and stoi(data_vec[i][8]) > num_graduates ){
+			result.push_back(data_vec[i]);
+			k++;
+		}
+    }
+    return result;
+}
+
+
+// åˆä½µæª”æ¡ˆ
+vector<vector<string>> DataProcess::UniqueSort( vector<vector<string>> data_vec, int data_column, vector<string> unique_data ){
+
+    vector<vector<string>> sort_data_vec;
+
+    // éæ­· unique data
+    for( int i=0; i<unique_data.size(); i++ ){
+        // éæ­·æ‰€æœ‰ data
+        for(int j=0; j<data_vec.size(); j++ ){
+            if( unique_data[i] == data_vec[j][data_column] ){
+                sort_data_vec.push_back( data_vec[j] );
+            }
+        }
+    }
 
 vector<vector<string>> DataProcess::UniqueSort( vector<vector<string>> data_vec, int data_column, vector<string> unique_data ){
 
     vector<vector<string>> sort_data_vec;
 
-    // ¹M¾ú unique data
+    // éæ­· unique data
     for( int i=0; i<unique_data.size(); i++ ){
-        // ¹M¾ú©Ò¦³ data
+        // éæ­·æ‰€æœ‰ data
         for(int j=0; j<data_vec.size(); j++ ){
             if( unique_data[i] == data_vec[j][data_column] ){
                 sort_data_vec.push_back( data_vec[j] );
@@ -140,21 +332,21 @@ vector<vector<string>> DataProcess::UniqueSort( vector<vector<string>> data_vec,
 }
 
 
-// Àò±o¬Y column «D­«½Æ¸ê®Æ
+// ç²å¾—æŸ column éé‡è¤‡è³‡æ–™
 vector<string> DataProcess::GetUniqueData( vector<vector<string>> data_vec, int data_colunm ){
     vector<string> unique_data;
 
-    // ¹M¾ú©Ò¦³ data
+    // éæ­·æ‰€æœ‰ data
     for( int i=0; i< data_vec.size(); i++ ){
         if( unique_data.empty() ){
             unique_data.push_back( data_vec[i][data_colunm] );
         }
         else{
-            // ¹M¾ú¤w¦³ unique data
+            // éæ­·å·²æœ‰ unique data
             for( int j=0; j < unique_data.size(); j++ ){
-                // ¦pªG¤w¦³¬Û¦P data ¸õ¥X
+                // å¦‚æœå·²æœ‰ç›¸åŒ data è·³å‡º
                 if( data_vec[i][data_colunm] == unique_data[j] )    break;
-                // ¦pªG§¹¥ş¨S¦³¬Û¦P data¡A¦s¦¹ data
+                // å¦‚æœå®Œå…¨æ²’æœ‰ç›¸åŒ dataï¼Œå­˜æ­¤ data
                 if( j == unique_data.size() - 1 )   unique_data.push_back( data_vec[i][data_colunm] );
             }
         }
@@ -162,7 +354,7 @@ vector<string> DataProcess::GetUniqueData( vector<vector<string>> data_vec, int 
     return unique_data;
 }
 
-// ³]©w Task3 ÀÉ®×¶}ÀY
+// è¨­å®š Task3 æª”æ¡ˆé–‹é ­
 string DataProcess::SetOuputTitle( string name1 ){
     string title = "";
 
@@ -173,12 +365,52 @@ string DataProcess::SetOuputTitle( string name1 ){
     return "output" + title + "_";
 }
 
-// ³]©w¿é¥XÀÉ®×¦W
+
+    return sort_data_vec;
+}
+
+
+// ç²å¾—æŸ column éé‡è¤‡è³‡æ–™
+vector<string> DataProcess::GetUniqueData( vector<vector<string>> data_vec, int data_colunm ){
+    vector<string> unique_data;
+
+    // éæ­·æ‰€æœ‰ data
+    for( int i=0; i< data_vec.size(); i++ ){
+        if( unique_data.empty() ){
+            unique_data.push_back( data_vec[i][data_colunm] );
+        }
+        else{
+            // éæ­·å·²æœ‰ unique data
+            for( int j=0; j < unique_data.size(); j++ ){
+                // å¦‚æœå·²æœ‰ç›¸åŒ data è·³å‡º
+                if( data_vec[i][data_colunm] == unique_data[j] )    break;
+                // å¦‚æœå®Œå…¨æ²’æœ‰ç›¸åŒ dataï¼Œå­˜æ­¤ data
+                if( j == unique_data.size() - 1 )   unique_data.push_back( data_vec[i][data_colunm] );
+            }
+        }
+    }
+    return unique_data;
+}
+
+// è¨­å®š Task3 æª”æ¡ˆé–‹é ­
+string DataProcess::SetOuputTitle( string name1 ){
+    string title = "";
+
+    for (int i=4 ; name1[i] != '.' ; i++ ){
+        title += name1[i];
+    }
+
+    return "output" + title + "_";
+}
+
+
+
+// è¨­å®šè¼¸å‡ºæª”æ¡ˆå
 string DataProcess::SetName( int title_length , string origin_name, string new_head ){
 
     string new_name = "";
 
-    // ¸õ¹L¶}ÀY (input:5, copy:4, ...)
+    // è·³éé–‹é ­ (input:5, copy:4, ...)
     for (int i=title_length ; origin_name[i] != '.' ; i++ ){
         new_name += origin_name[i];
     }
@@ -192,14 +424,13 @@ void DataProcess::CleanData( vector<vector<string>> & data_vec ){
     data_vec.clear();
 }
 
-// Àx¦s Data ¬°·sÀÉ®× (©Î½Æ¼gÀÉ®×)
+// å„²å­˜ Data ç‚ºæ–°æª”æ¡ˆ (æˆ–è¤‡å¯«æª”æ¡ˆ)
 void DataProcess::OuputData( vector<vector<string>> & data_vec, string file_name ){
 
     ofstream outfile(file_name);
 
     for ( int i=0 ; i < data_vec.size() ; i++ ){
-
-        // ¦L¥X1 line
+        // å°å‡º1 line
         for ( int j=0 ; j < 11 ; j++ ){
             outfile << data_vec[i][j] << "\t";
         }
@@ -208,32 +439,32 @@ void DataProcess::OuputData( vector<vector<string>> & data_vec, string file_name
 }
 
 
-// ¦L¥X Data
+// å°å‡º Data
 void DataProcess::PrintData( vector<vector<string>> & data_vec ){
-    // ¦L¥X Data
-    for ( int i=0 ; i < data_vec.size() ; i++ ){
-        cout << "[" << i+1 << "]\t";
-
-        // ¦L¥X1 line
+    // å°å‡º Data
+    int i;
+    for ( i = 0 ; i < data_vec.size() ; i++ ){
+        // å°å‡º1 line
+    	cout << "[" << i+1 << "]\t";
         for ( int j=0 ; j < 11 ; j++ ){
-            cout << data_vec[i][j] << "\t";
+        	cout << data_vec[i][j] << "\t";		
         }
-        cout << endl;
     }
+    cout << endl << "Number of records = " << i << endl;
 }
 
 
-// §R°£ Line
+// åˆªé™¤ Line
 void DataProcess::DeleteLine( vector<vector<string>> & data_vec, int start_idx, int end_idx ){
 
-    vector<vector<string>>::iterator it;   // ¦ì¸m«ü¼Ğ­¡¥N¾¹
+    vector<vector<string>>::iterator it;   // ä½ç½®æŒ‡æ¨™è¿­ä»£å™¨
 
-    // §R°£1 line
+    // åˆªé™¤1 line
     if( end_idx == -1){
-        it = data_vec.begin() + start_idx;        // ¨ú±o­n§R°£ªº¦ì¸m­¡¥N
-        data_vec.erase(it);                       // §R°£¸Óline
+        it = data_vec.begin() + start_idx;        // å–å¾—è¦åˆªé™¤çš„ä½ç½®è¿­ä»£
+        data_vec.erase(it);                       // åˆªé™¤è©²line
     }
-    // §R°£¦h­Ó line
+    // åˆªé™¤å¤šå€‹ line
     else{
         vector<vector<string>>::iterator it2;
         it = data_vec.begin() + start_idx;
@@ -243,27 +474,27 @@ void DataProcess::DeleteLine( vector<vector<string>> & data_vec, int start_idx, 
 }
 
 
-// Åª¨ú Data
+// è®€å– Data
 void DataProcess::ReadData( ifstream & file, vector<vector<string>> & data_vec){
 
-    string line_str;    // line ¦r¦ê
+    string line_str;    // line å­—ä¸²
 
     while( getline( file, line_str, '\n' ) ){
-        vector<string> line_vec;            // ·s¼W line_vec
-        ReadLine(line_str, line_vec);        // ¦s¨ú line ¸ê®Æ
-        data_vec.push_back( line_vec );     // ±N line_vec ¥[¤J data_vec
+        vector<string> line_vec;            // æ–°å¢ line_vec
+        ReadLine(line_str, line_vec);        // å­˜å– line è³‡æ–™
+        data_vec.push_back( line_vec );     // å°‡ line_vec åŠ å…¥ data_vec
     }
 }
 
-// Åª¨ú Line Data
+// è®€å– Line Data
 void DataProcess::ReadLine( string line_str, vector<string> & line_vec ){
 
-    stringstream ss(line_str);              // Åª¨ú line_str
+    stringstream ss(line_str);              // è®€å– line_str
     string str;
 
-    // ¦s¨ú¸ê®Æ ( 11: ¨C line ¸ê®Æ¼Æ )
+    // å­˜å–è³‡æ–™ ( 11: æ¯ line è³‡æ–™æ•¸ )
     for( int i = 0 ; i<11 ; i++ ){
-        getline(ss, str, '\t');              // \t ¤Á³Î¸ê®Æ
-        line_vec.push_back( str );          // ¦s¨ú¸Ó¸ê®Æ
+        getline(ss, str, '\t');              // \t åˆ‡å‰²è³‡æ–™
+        line_vec.push_back( str );          // å­˜å–è©²è³‡æ–™
     }
 }
