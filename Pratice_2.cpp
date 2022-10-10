@@ -40,11 +40,11 @@ class FileTask{
         void ReadFile( string filename, vector<vector<string>> & data_vec, string & name );     // 讀取資料
 };
 
-// 防呆類別 
+// 防呆函數 
 bool HaveFile( string name ); //檢查輸入的檔案名稱是否存在 
+bool Isint(string input);
+bool FileIsCorrect( string name, int mode );
 string FormalName( string name, int mode ); //將輸入的檔案名稱正規化 
-bool Isint(string input,int i);
-
 
 int main(){
 	int command = 10;
@@ -58,7 +58,7 @@ int main(){
 		cout << endl << "Input a choice(0, 1, 2, 3):";
 		string input;
 		cin >> input;
-		if (not Isint(input,0))
+		if (not Isint(input))
 			continue;
 		command = stoi(input);
 		switch( command ){
@@ -69,7 +69,7 @@ int main(){
 					cin >> open_file;
 					// 正規化檔案名稱 
 					open_file = FormalName(open_file,1);
-				}while(!HaveFile(open_file)); // 檔案是否存在 
+				}while(!HaveFile(open_file) or !FileIsCorrect( open_file, 1 )); // 檔案是否存在 
 				
 				// 若輸入0則結束 
 				if (open_file[0] == '0' and open_file.size() == 1)
@@ -84,23 +84,27 @@ int main(){
 			case 2:{
 				string open_file,students,graduates;
 				int num_students, num_graduates;
+				// 輸入檔案 
 				do{
 					cout << endl << "Input 201, 202, ...[0]Quit):";
 					cin >> open_file;
 					open_file = FormalName(open_file,2);
-				}while(!HaveFile(open_file));
+				}while( !HaveFile(open_file) or !FileIsCorrect( open_file, 2 ) );
 				
 				if (open_file[0] == '0' and open_file.size() == 1)
 					break;
+					
+				// 輸入學生數 
 				do{
 					cout << endl << "Input a lower bound on the number of students:";
 					cin >> students;
-				}while(!Isint(students,0));
+				}while(!Isint(students));
 				
+				// 輸入畢業數 
 				do{
 					cout << endl << "Input a lower bound on the number of graduates:";
 					cin >> graduates;
-				}while(!Isint(graduates,0));
+				}while(!Isint(graduates));
 				
 				num_students = stoi(students);
 				num_graduates = stoi(graduates);
@@ -117,14 +121,15 @@ int main(){
 				cout << endl << "Input 201, 202, ...[0]Quit):";
 					cin >> open_file1;
 					open_file1 = FormalName(open_file1,3);
-				}while(!HaveFile(open_file1));
+				}while(!HaveFile(open_file1) or !FileIsCorrect( open_file1, 3 ));
 				if (open_file1[0] == '0' and open_file1.size() == 1)
 					break;
+					
 				do{
 					cout << endl << "Input 201, 202, ...[0]Quit):";
 					cin >> open_file2;
 					open_file2 = FormalName(open_file2,3);
-				}while(!HaveFile(open_file2));
+				}while(!HaveFile(open_file2) or !FileIsCorrect( open_file2, 3 ));
 				if (open_file2[0] == '0' and open_file2.size() == 1)
 					break;
 					
@@ -136,6 +141,7 @@ int main(){
 			}
 			
 			default:{
+				cout << "Command does not exist!";
 			    break;
 			}
 		}
@@ -196,27 +202,8 @@ void FileTask::Select( vector<vector<string>> & data_vec,int num_students, int n
     dp.OuputData( data_vec, output_name );
 }
 
-// 讀取檔案
-//bool FileTask::ReadFile( string filename, vector<vector<string>> & data_vec, string & name ){
-//    // 讀取檔案
-//    ifstream infile( filename );
-//
-//    // 確認有無讀取檔案
-//    if( infile.fail() ){
-//        cout << "Fail to read File" << endl;
-//        infile.close();                     // 關閉檔案
-//        return false;
-//    }
-//
-//    else{
-//        cout << "Read File Success" << endl;
-//        name = filename;
-//        dp.ReadData( infile, data_vec );  // 存取檔案
-//        infile.close();                   // 關閉檔案
-//        return true;
-//    }
-//}
 
+// 讀取檔案 
 void FileTask::ReadFile( string filename, vector<vector<string>> & data_vec, string & name ){
     // 讀取檔案
     ifstream infile( filename );
@@ -242,12 +229,30 @@ bool HaveFile( string name ) {
 	return true;
 }
 
-
+// 判斷名稱是否正規
+bool FileIsCorrect( string name, int mode ){
+	if(mode == 1){
+		string test = "input";
+		for( int i = 0; i < 5; i++ ){
+			if( test[i]!=name[i])
+				return false;
+		}
+	}
+	else if ( mode == 2 or mode == 3) {
+		string test = "copy";
+		for( int i = 0; i < 4; i++ ){
+			if( test[i]!=name[i])
+				return false;
+		}
+	}
+			
+	return true;
+}
 // 正規化檔案名稱
 string FormalName( string name, int mode ){
 	if (name[0] == '0' and name.size() == 1)
 		return name;
-	if (Isint(name,0)){
+	if (Isint(name)){
 		if(mode == 1)
 			name = "input" + name + ".txt";
 		else if ( mode == 2) 
@@ -259,8 +264,8 @@ string FormalName( string name, int mode ){
 } 
 
 
-// 判斷字串是否全為整數 
-bool Isint(string input,int i){
+// 判斷字串是否全為正整數 
+bool Isint(string input){
 	for( int i = 0; i < input.size() ; i++ ) {
 		if( input[i] > '9' or input[i] < '0')
 			return false;
@@ -272,10 +277,11 @@ bool Isint(string input,int i){
 
 // 篩選條件
 vector<vector<string>> DataProcess::Filter( vector<vector<string>> data_vec, int num_students,int num_graduates ){
+	
 	vector<vector<string>> result;
+	
 	int k = 0;
     for ( int i=0 ; i < data_vec.size() ; i++ ){
-    	int l = 0;
     	if ( stoi(data_vec[i][6]) > num_students and stoi(data_vec[i][8]) > num_graduates ){
 			result.push_back(data_vec[i]);
 			k++;
@@ -383,9 +389,8 @@ void DataProcess::PrintData( vector<vector<string>> & data_vec ){
         for ( int j=0 ; j < 11 ; j++ ){
         	cout << data_vec[i][j] << "\t";		
         }
-        cout << endl;
     }
-    cout  << "Number of records = " << i << endl;
+    cout << endl << "Number of records = " << i << endl;
 }
 
 
