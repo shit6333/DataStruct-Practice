@@ -165,6 +165,7 @@ int Manipulate_Stack::Calculate( int front_num, int back_number, string cal_oper
 void Manipulate_Stack::PrintPostFix(){
     if( postfix_st.isEmpty() )
         String2Postfix( function_str );
+
     postfix_st.ShowAll();
 }
 
@@ -196,11 +197,13 @@ void Manipulate_Stack::In2Postfix(){
             postfix_st.Push( true, str );
         // 字串為運算元
         else{
+
             // sym stack 沒有運算元 ------------------------------------//
-            if( symbol_st.isEmpty() )
+            if( symbol_st.isEmpty() ){
                 symbol_st.Push( false, str );
+            }
             // 運算原為 "(" 或 symbol stack 最上層為 "(" ----------------//
-            else if( str == "(" || symbol_st.GetTop()=="(" )
+            else if( ( str == "(" || symbol_st.GetTop()=="(" ) && str !=")" )
                 symbol_st.Push( false, str );
             // 新運算元位階高於前一運算元 ------------------------------------//
             else if( IsBiggerSymbol( str, symbol_st.GetTop() ) )  {
