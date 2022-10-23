@@ -50,6 +50,8 @@ private:
     Stack infix_st;     // 中序式 stack
     Stack str_st;       // 字串 stack
 
+    bool function_Is_valid; // 運算式合法
+
     bool IsNum( char ch );  // 是否為數字
     bool IsBiggerSymbol( string new_sym, string old_sym );  // 比較運算子位階
     void Backward( bool back_to_end );                       // 往前取出 symbol stack
@@ -66,6 +68,7 @@ public:
 
     void String2Postfix( string str );  // string 轉後序式 stack
     void PrintPostFix();                 // 印出後序式
+    bool FunctionIsValid();
     int CalculatePostfix();              // 計算後序式 (會清空後序式)
 
 };
