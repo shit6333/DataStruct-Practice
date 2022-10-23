@@ -8,7 +8,7 @@ using namespace std;
 
 
 int main(){
-    string str = "69/3+30*5-24/8";
+    string str = "1+(50)";
 
     Manipulate_Stack ms;
     ms.String2Postfix( str );
@@ -16,6 +16,7 @@ int main(){
 
     int ans = ms.CalculatePostfix();
     cout << endl <<  ans << endl;
+
 
 }
 
