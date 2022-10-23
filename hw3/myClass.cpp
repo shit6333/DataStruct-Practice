@@ -109,8 +109,12 @@ int Stack::GetLength(){
 // 初始函數
 Manipulate_Stack::Manipulate_Stack(){
     function_str = "0";
+    function_Is_valid = true;
 }
 
+bool Manipulate_Stack::FunctionIsValid(){
+    return function_Is_valid;
+}
 
 // 計算後序式 (計算完後序式會為空)
 int Manipulate_Stack::CalculatePostfix(){
@@ -123,15 +127,24 @@ int Manipulate_Stack::CalculatePostfix(){
 
             postfix_st.Retrive( temp_isNum, temp_str );
 
+            // 讀取到數字
             if( temp_isNum ){
                 temp_st.Push( temp_isNum, temp_str );
                 postfix_st.Pop();
             }
+            // 讀取到運算元
             else{
                 int back_number = String2Int( temp_st.GetTop() );
                 temp_st.Pop();
                 int front_number = String2Int( temp_st.GetTop() );
                 temp_st.Pop();
+
+                // "x / 0" 情況
+                if( temp_str == "/" && back_number==0 ){
+                    function_Is_valid = false;
+                    return -999;
+                }
+
                 int cal = Calculate( front_number, back_number, temp_str );
                 temp_st.Push( true, to_string(cal) );
 
