@@ -29,8 +29,8 @@ class Simulation{
 
 public:
     Simulation( string jobList_name );
-    void Simulate();
-    void Simulate2();
+    void Simulate();                    // 模擬一個 worker
+    void Simulate2();                   // 模擬兩個 worker
 
     void ShowList();
 

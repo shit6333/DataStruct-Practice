@@ -49,8 +49,6 @@ public:
     bool FailListIsEmpty();
     bool TimeOutListIsEmpty();
 
-
-    // TODO : ­pºâ²Î­p­È
 };
 
 #endif // ANS
