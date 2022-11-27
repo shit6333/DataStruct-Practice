@@ -263,5 +263,6 @@ void Simulation::ShowList(){
 
     cout << "[Total Delay]\n";
     cout << total_delay << " min.\n";
+    cout << "[Failure Percentage]\n";
     cout << round(fail_Percentage*100)/100 << " %\n";
 }
